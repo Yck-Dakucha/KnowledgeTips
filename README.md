@@ -58,3 +58,48 @@ UIWebView *callWebView = [[UIWebView alloc]init];
 }
 
 ```
+
+###4--获取当前屏幕的VC
+
+```
+//获取当前屏幕显示的ViewController
++ (UIViewController *)getCurrentVC
+{
+    UIViewController *result = nil;
+    UIWindow * window = [[UIApplication sharedApplication] keyWindow];
+    if (window.windowLevel != UIWindowLevelNormal)
+    {
+        NSArray *windows = [[UIApplication sharedApplication] windows];
+        for(UIWindow * tempWindow in windows)
+        {
+            if (tempWindow.windowLevel == UIWindowLevelNormal)
+            {
+                window = tempWindow;
+                break;
+            }
+        }
+    }
+    UIView *frontView = [[window subviews] objectAtIndex:0];
+    id nextResponder = [frontView nextResponder];
+    if ([nextResponder isKindOfClass:[UITabBarController class]]) {
+        UITabBarController *tempTabBarVC = (UITabBarController *)nextResponder;
+        UIViewController *navVC = tempTabBarVC.selectedViewController;
+        if ([navVC isKindOfClass:[UINavigationController class]]) {
+            UINavigationController *tempNav = (UINavigationController *)navVC;
+            result = tempNav.topViewController;
+        }else {
+            result = navVC;
+        }
+    }
+    else if ([nextResponder isKindOfClass:[UINavigationController class]]){
+        UINavigationController *tempNav = (UINavigationController *)nextResponder;
+        result = tempNav.topViewController;
+    }else if ([nextResponder isKindOfClass:[UIViewController class]]){
+        result = nextResponder;
+    }else {
+        result = window.rootViewController;
+    }
+    return result;
+}
+
+```
