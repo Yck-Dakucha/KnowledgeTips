@@ -103,3 +103,51 @@ UIWebView *callWebView = [[UIWebView alloc]init];
 }
 
 ```
+
+###5--保存图片到系统相册
+* 出自<http://blog.csdn.net/hengshujiyi/article/details/22879495>
+ 
+应用中有时我们会有保存图片的需求，如利用UIImagePickerController用IOS设备内置的相机拍照，或是有时我们在应用程序中利用UIKit的 UIGraphicsBeginImageContext，UIGraphicsEndImageContext，UIGraphicsGetImageFromCurrentImageContext方法创建一张图像需要进行保存。 IOS的UIKit Framework提供了UIImageWriteToSavedPhotosAlbum方法对图像进行保存，该方法会将image保存至用户的相册中，描述如下：
+
+```
+void UIImageWriteToSavedPhotosAlbum (
+   UIImage  *image,
+   id       completionTarget,
+   SEL      completionSelector,
+   void     *contextInfo
+  );
+   
+```
+
+参数说明： 
+
+* image 带保存的图片UImage对象 
+* completionTarget 图像保存至相册后调用completionTarget指定的selector（可选） 
+* completionSelector completionTarget的方法对应的选择器，相当于回调方法，需满足以下格式 
+
+```
+- (void) image: (UIImage *) image didFinishSavingWithError: (NSError *) error contextInfo: (void *) contextInfo;
+
+```
+
+当我们需要异步获得图像保存结果的消息时，我们需要指定completionTarget对象以及其completionSelector对应的选择器。示例如下
+
+```
+- (IBAction)saveImageToAlbum:(id)sender {
+    UIImageWriteToSavedPhotosAlbum(self.imageView.image, self, @selector(imageSavedToPhotosAlbum:didFinishSavingWithError:contextInfo:), nil);
+}
+
+//实现imageSavedToPhotosAlbum:didFinishSavingWithError:contextInfo:方法
+
+- (void)imageSavedToPhotosAlbum:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo
+{
+    NSString *message = @"呵呵";
+    if (!error) {
+        message = @"成功保存到相册";
+    }else
+    {
+        message = [error description];
+    }
+    NSLog(@"message is %@",message);
+}
+```
