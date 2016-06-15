@@ -151,3 +151,30 @@ void UIImageWriteToSavedPhotosAlbum (
     NSLog(@"message is %@",message);
 }
 ```
+
+###6--关于collectionView与tableView的cell的复用问题
+collectionView对于cell的不用试通过`initWithFrame`方法，  
+而tableView是通过`- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier;`  
+对于headerFooterView，collectionView一样是通过`initWithFrame`  
+而tableView是通过`- (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier;`
+
+###7--Unable to simultaneously satisfy constraints
+<http://www.cnblogs.com/zhouyi-ios/p/5240003.html>  
+
+表示无法同时满足所有约束。
+
+一、出现的场景
+
+当我创建一个width为100的视图，我添加距左约束300，居右约束300后，运行后视图不显示，而且控制台有输出。
+
+原因：屏幕的宽度为640时，而上面100+300＋300已经超出屏幕的宽度，这是width被压缩，所以导致了这个问题。。。
+
+ 
+
+二、基本概念
+
+1、intrinsicContentSize：固有大小。即视图在不受约束影响时，本来的尺寸。
+2、Content Hugging Priority：内容压缩优先级。即阻止view返回的实际尺寸比intrinsicContentSize大的优先级。默认为251，如果某约束优先级低于251，则不拉伸视图，动态增加低优先级的约束值。
+3、Content Compression Resistance Priority：内容抗压缩优先级。默认为750，如果某约束优先级低于750，则不压缩视图，动态减少低优先级的约束值。
+ 
+在autoLayout中，默认添加的约束的优先级为1000，如果约束设置不妥当，则会压缩/拉伸视图，那么如果设置了Content Hugging Priority/Content Compression Resistance Priority，则解决了约束设置和intrinsicContentSize冲突的问题
