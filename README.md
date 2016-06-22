@@ -178,3 +178,22 @@ collectionView对于cell的不用试通过`initWithFrame`方法，
 3、Content Compression Resistance Priority：内容抗压缩优先级。默认为750，如果某约束优先级低于750，则不压缩视图，动态减少低优先级的约束值。
  
 在autoLayout中，默认添加的约束的优先级为1000，如果约束设置不妥当，则会压缩/拉伸视图，那么如果设置了Content Hugging Priority/Content Compression Resistance Priority，则解决了约束设置和intrinsicContentSize冲突的问题
+
+###8--数据库报错SQLiteLog (1) no such Column: 
+
+今天在进入sqlite数据库查询的时候出现了这个问题，SQLiteLog (1) no such Column: B4B147BC522828731F1A016BFA72C073，很明显问题是数据库中没有这一列，但是检查过之后数据库中明显存在  
+sql语句是  
+	
+```
+	//查询满足两个条件的数据
+	NSString *sql = [NSString stringWithFormat:@"SELECT * FROM t_downloading WHERE user_id = %ld and videoName = %@;",(long)kUserID,videoDetail.fileName];
+
+```
+
+“B4B147BC522828731F1A016BFA72C073”是我报错时候传入的videoDetail.fileName，它并不是我数据库中的列名字段，查询一段时间后发现我的videoDetail.fileName是TEXT类型，并不是通常所用的Integer类型，sql语句应该改为  
+
+```
+//注意\的使用，不然会报错
+NSString *sql = [NSString stringWithFormat:@"SELECT * FROM t_downloading WHERE user_id = %ld and videoName = \"%@\";",(long)kUserID,videoDetail.fileName];
+```
+这样才能获取数据库表中的数据，否则则出现类似没有列名,列名是参数的错误，
