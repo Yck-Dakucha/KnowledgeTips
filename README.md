@@ -197,3 +197,22 @@ sql语句是
 NSString *sql = [NSString stringWithFormat:@"SELECT * FROM t_downloading WHERE user_id = %ld and videoName = \"%@\";",(long)kUserID,videoDetail.fileName];
 ```
 这样才能获取数据库表中的数据，否则则出现类似没有列名,列名是参数的错误，
+
+###9--修改backBarButtonItem的标题:  
+有时候我们需要修改backBarButtonItem的标题，我们可能会这样做：  
+
+```
+self.navigationItem.backBarButtonItem.title = @"返回";
+
+```
+但是并不能返回，因为可以跟中backBarButtonItem，他没有值，于是我们附一个新值给它：
+  
+```
+UIBarButtonItem *backItem = [[UIBarButtonItem alloc] init];
+backItem.title = @"返回";
+self.navigationItem.backBarButtonItem = backItem;
+
+```
+然而还不成功，这是因为你改的是下一级页面的标题。比如有A和B界面，从A切换到B，那么你要修改B上的返回按钮标题就要在A里加入你上面的代码，因为back按钮是属于上一个页面的。
+
+
