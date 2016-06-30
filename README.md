@@ -90,12 +90,17 @@ UIWebView *callWebView = [[UIWebView alloc]init];
         }else {
             result = navVC;
         }
-    }
-    else if ([nextResponder isKindOfClass:[UINavigationController class]]){
+    }else if ([nextResponder isKindOfClass:[UINavigationController class]]){
         UINavigationController *tempNav = (UINavigationController *)nextResponder;
         result = tempNav.topViewController;
     }else if ([nextResponder isKindOfClass:[UIViewController class]]){
         result = nextResponder;
+    }else if ([nextResponder isKindOfClass:[UIWindow class]]){
+        UIWindow *resPonder = (UIWindow *)nextResponder;
+        //这里需要确定rootViewController属于哪个类
+        UITabBarController *tabBarVC = (UITabBarController *)resPonder.rootViewController;
+        UINavigationController *vc = tabBarVC.selectedViewController;
+        result = vc.visibleViewController;
     }else {
         result = window.rootViewController;
     }
