@@ -244,3 +244,20 @@ self.navigationItem.backBarButtonItem = backItem;
 * NSExpansionAttributeName; //字体扁平化  
 * NSVerticalGlyphFormAttributeName;//垂直或者水平，value是 NSNumber，0表示水平，1垂直  
 
+###11--删除某个cell的分割线
+在一些时候，在tableView上我们需要系统分割线，但在某个cell又不想显示分割选，cell中又没有这个方法，只有调整他的缩进，其实分割线还是在cell的View上的，我们打印cell的subViews的class，可以得到一个`_UITableViewCellSeparatorView` 的view，这就是我们想要找到的分割线，设置removeFromSuperview就可以了，设置hidden是不可行的。
+
+```
+[cell.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                    if ([obj isKindOfClass:NSClassFromString(@"_UITableViewCellSeparatorView")]) {
+                        [obj removeFromSuperview];
+                    }
+                }];
+
+```
+
+
+
+
+
+
