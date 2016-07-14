@@ -255,6 +255,16 @@ self.navigationItem.backBarButtonItem = backItem;
                 }];
 
 ```
+###12--快速pod update/install
+
+pod update --verbose --no-repo-update
+
+###13--在- (UIViewController *)popViewControllerAnimated:(BOOL)animated中调用popToRootViewControllerAnimated会导致navigationBar显示异常
+  
+  具体原因待研究
+  
+
+
 
 
 
