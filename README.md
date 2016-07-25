@@ -263,6 +263,95 @@ pod update --verbose --no-repo-update
   
   具体原因待研究
   
+###14--关于屏幕旋转问题
+
+最近遇到了屏幕旋转的坑，记录一下以思悔过。  
+对于莫名其妙的问题，一定要细心细心细心！！  
+对于iOS7以后，对于屏幕旋转的支持：  
+
+1. 在plist.info里进行支持
+2.  在VC里边配置  
+
+对于现在APP的主流框架TabBar+NavigationVC的模式，我们需要设置如下：  
+
+在`baseTabBarController`中：  
+
+```
+//是否支持旋转
+- (BOOL)shouldAutorotate {
+    return [self.selectedViewController shouldAutorotate];
+}
+//设置转屏支持的方向
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return [self.selectedViewController supportedInterfaceOrientations];
+}
+
+```  
+
+在`baseNavgationVC`中：  
+
+```
+//是否支持旋转
+- (BOOL)shouldAutorotate {
+    return [self.visibleViewController shouldAutorotate];
+}
+//设置转屏支持的方向
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+{
+    return [self.visibleViewController supportedInterfaceOrientations];
+}
+
+```
+
+对于我们的项目，一般我们都会有一个`BaseViewController`来控制一些统一设置的方法，所以我在我的BaseViewController中设置了：
+
+```
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskAllButUpsideDown;
+}
+
+```
+
+一切的逻辑都正常，测试也正常，由于在BaseViewController中设置了shouldAutorotate返回值是NO,只有在子类重写shouldAutorotate为YES的时候才会旋转，但是。。没有但是的话也就没了这个记录。。
+当我们: 
+
+```
+[self presentViewController:[[ZXBaseNavigation alloc] initWithRootViewController:loginVC] animated:YES completion:nil];
+```
+模态出来一个视图的时候，如果在摩太值钱旋转了设备。。就会导致模态出来的这个loginVC发生旋转（loginVC也是BaseViewController的子类），而且此时在旋转设备也没反应，说明shouldAutorotate起了作用。这是什么原因造成呢？
+
+###懒！懒！懒！
+
+我们仔细看我`BaseViewController`中`supportedInterfaceOrientations`的方法  
+
+由于有几个页面需要屏幕旋转我就吧页面支持了`UIInterfaceOrientationMaskAllButUpsideDown`屏幕方向   
+
+心中想着只要在需要旋转的视图修改`shouldAutorotate`为YES就可以了，就不用多写一个方法`supportedInterfaceOrientations`了
+
+问题就出在这里，因为我是在BaseViewController中写的`supportedInterfaceOrientations`为`UIInterfaceOrientationMaskAllButUpsideDown`，就导致了所有的BaseViewController子类都支持三个屏幕方向，在我们模态视图的时候，APP的window的rootViewController发生了变化，他就会去调用
+shouldAutorotate和supportedInterfaceOrientations，由于我们的视图是支持三个方向的，所以此时视图会根据设备的方向去loadView，由于shouldAutorotate为NO，所以他不会旋转。
+
+所以我们应该在BaseViewController中这样写：
+
+```
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskPortrait;
+}
+
+```
+让其只支持竖屏，然后在需要支持其他方向的VC去重写这个两个方法完成屏幕的旋转。
+
+
+
+  
 
 
 
