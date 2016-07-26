@@ -347,8 +347,8 @@ shouldAutorotate和supportedInterfaceOrientations，由于我们的视图是支�
 }
 
 ```
-让其只支持竖屏，然后在需要支持其他方向的VC去重写这个两个方法完成屏幕的旋转。
-
+让其只支持竖屏，然后在需要支持其他方向的VC去重写这个两个方法完成屏幕的旋转。  
+###ps:如果你有自己的alertViewController，他的shouldAutorotate与supportedInterfaceOrientations一定要与BaseViewController相同！
 
 
   
