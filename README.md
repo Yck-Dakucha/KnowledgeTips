@@ -288,7 +288,7 @@ pod update --verbose --no-repo-update
 
 ```  
 
-在`baseNavgationVC`中：  
+在`BaseNavgationVC`中：  
 
 ```
 //是否支持旋转
@@ -348,7 +348,74 @@ shouldAutorotate和supportedInterfaceOrientations，由于我们的视图是支�
 
 ```
 让其只支持竖屏，然后在需要支持其他方向的VC去重写这个两个方法完成屏幕的旋转。  
-###ps:如果你有自己的alertViewController，他的shouldAutorotate与supportedInterfaceOrientations一定要与BaseViewController相同！
+~~###ps:如果你有自己的UIAlertController，他的shouldAutorotate与supportedInterfaceOrientations一定要与BaseViewController相同！~~
+
+今天又发现一个问题，如果项目里边使用了UIAlertController，在preserent的时候会产生crash的情况，后台抛出异常  
+
+	*** Terminating app due to uncaught exception 'NSInternalInconsistencyException', reason: 'UIAlertController:supportedInterfaceOrientations was invoked recursively!'
+	
+是因为UIAlertController现在是作为一个单独的控制器模态出来的，我们的BaseNavgationVC中选择的写的`supportedInterfaceOrientations`为可见的控制器，当preserent出UIAlertController的时候，系统会去UIAlertController中寻找这个方法，然而没有找到就会产生崩溃，最好的做法就是在BaseNavgationVC中进行判断 
+
+``` 
+
+	- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+{
+    if ([self.visibleViewController isKindOfClass:[UIAlertController class]]) {
+        return UIInterfaceOrientationMaskAll;
+    }
+    return [self.visibleViewController supportedInterfaceOrientations];
+}
+
+```
+
+
+所以最终写法是：
+
+###TabBarController中
+
+```
+//是否支持旋转
+- (BOOL)shouldAutorotate {
+    return [self.selectedViewController shouldAutorotate];
+}
+//设置转屏支持的方向
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return [self.selectedViewController supportedInterfaceOrientations];
+}
+
+```
+###BaseNavigationController中
+
+```
+//是否支持旋转
+- (BOOL)shouldAutorotate {
+    return [self.visibleViewController shouldAutorotate];
+}
+//设置转屏支持的方向
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+{
+	//这里去除UIAlertController的情况
+    if ([self.visibleViewController isKindOfClass:[UIAlertController class]]) {
+        return UIInterfaceOrientationMaskAll;
+    }
+    return [self.visibleViewController supportedInterfaceOrientations];
+}
+
+```
+###BaseViewController中
+
+```
+//是否支持旋转
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+//设置转屏支持的方向
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskPortrait;
+}
+
+```
+
 
 
   
