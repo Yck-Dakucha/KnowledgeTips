@@ -416,6 +416,15 @@ shouldAutorotate和supportedInterfaceOrientations，由于我们的视图是支�
 
 ```
 
+###15--EXC_BAD_ACCESS EXC_I386_GPFLT问题
+有可能是在你构建一个字符串的时候，例如
+
+```
+	NSString *pathName = [NSString stringWithFormat:@"Documents/VideoTemp/%@.mp4",task.zx_videoModel.fileName];
+	
+```
+当这个task.zx_videoModel已经被dealloc的时候，就会出现EXC_BAD_ACCESS EXC_I386_GPFLT，可以检查一下代码在运行到这里的时候对象是否已经被销毁
+
 
 
   
